@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- xUnit reflects on public types for ClassFixture; CA1515 wants
+         tests internal but the fixture has to be public. -->
+    <!-- CA1515: xUnit's ClassFixture needs public types.
+         CA1056: SchemaRegistryUrl as string keeps the test code idiomatic;
+         the SDK accepts strings on the SchemaRegistryConfig.Url field. -->
+    <NoWarn>$(NoWarn);CA1515;CA1056</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Kuestenlogik.Bowire" />
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" />
+    <PackageReference Include="Testcontainers" />
+    <PackageReference Include="Testcontainers.Kafka" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kuestenlogik.Bowire.Protocol.Kafka\Kuestenlogik.Bowire.Protocol.Kafka.csproj" />
+  </ItemGroup>
+</Project>

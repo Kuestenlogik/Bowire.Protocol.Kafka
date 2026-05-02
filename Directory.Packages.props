@@ -1,0 +1,35 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Bowire contract package. Carries IBowireProtocol +
+         IBowireMockEmitter (the latter under Kuestenlogik.Bowire.Mocking since
+         Bowire v0.2), so plugins reference only this one package. -->
+    <PackageVersion Include="Kuestenlogik.Bowire" Version="1.0.0" />
+
+    <!-- Kafka client. Confluent's official .NET client is the de-facto
+         standard for Kafka protocol work in .NET. -->
+    <PackageVersion Include="Confluent.Kafka" Version="2.14.0" />
+
+    <!-- Confluent Schema Registry — discovery side. CachedSchemaRegistryClient
+         talks to the registry HTTP API; AvroDeserializer reads the
+         Confluent wire format (5-byte magic + schema id + payload) into
+         GenericRecord, which we project to JSON for the Bowire UI. -->
+    <PackageVersion Include="Confluent.SchemaRegistry" Version="2.14.0" />
+    <PackageVersion Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.14.0" />
+
+    <!-- Test-only -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <!-- Testcontainers — real broker + Schema Registry round-trips. The
+         Kafka image is published by Confluent under cp-kafka; the
+         Testcontainers.Kafka helper drives it with KRaft so no Zookeeper
+         container is needed. Schema Registry uses the generic builder
+         pointed at confluentinc/cp-schema-registry. -->
+    <PackageVersion Include="Testcontainers" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Kafka" Version="4.11.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.203" />
+  </ItemGroup>
+</Project>
