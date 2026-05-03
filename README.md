@@ -94,6 +94,18 @@ bowire plugin install Kuestenlogik.Bowire.Protocol.Kafka
 
 Then start the workbench and enter a Kafka broker URL in the sidebar.
 
+## Sample
+
+A runnable end-to-end sample lives under [`samples/Kuestenlogik.Bowire.Protocol.Kafka.Sample`](samples/Kuestenlogik.Bowire.Protocol.Kafka.Sample) — a single-node Kafka cluster (Docker Compose) plus an ASP.NET Core host that publishes harbour-domain port-call and berth-status events on two topics, so the live consume stream is never quiet.
+
+```bash
+cd samples/Kuestenlogik.Bowire.Protocol.Kafka.Sample
+docker compose up -d
+dotnet run --project .
+```
+
+Then open <http://localhost:5080/bowire>, pick the **Kafka** tab, point it at `kafka://localhost:9092`, and stream `harbor.port-calls → consume`.
+
 ## Tests
 
 The unit-test suite is hermetic and runs anywhere `dotnet test` does:

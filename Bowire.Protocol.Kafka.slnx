@@ -5,6 +5,9 @@
   <Folder Name="/tests/">
     <Project Path="tests/Kuestenlogik.Bowire.Protocol.Kafka.Tests/Kuestenlogik.Bowire.Protocol.Kafka.Tests.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Kuestenlogik.Bowire.Protocol.Kafka.Sample/Kuestenlogik.Bowire.Protocol.Kafka.Sample.csproj" />
+  </Folder>
   <Folder Name="/solution items/">
     <File Path="README.md" />
     <File Path="Directory.Build.props" />
