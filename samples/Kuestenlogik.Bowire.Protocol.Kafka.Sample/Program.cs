@@ -3,6 +3,11 @@
 
 using Kuestenlogik.Bowire;
 using Kuestenlogik.Bowire.Protocol.Kafka.Sample.Harbor;
+// Force the Kafka plugin assembly to load before AddBowire's
+// reflection scan runs — without an explicit type reference the
+// JIT only loads the plugin DLL on first use, too late for the
+// discovery pass.
+_ = typeof(Kuestenlogik.Bowire.Protocol.Kafka.BowireKafkaProtocol);
 
 // Runnable Bowire-Kafka demo. Hosts a small ASP.NET Core app with
 // AddBowire() so the workbench attaches at /bowire, then publishes a
@@ -23,6 +28,12 @@ builder.Services.AddBowire();
 builder.Services.AddHarborStreamPublisher(builder.Configuration);
 
 var app = builder.Build();
-app.MapBowire();
+// Pre-seed the Kafka broker (matches docker-compose.yml) as a
+// discovered ServerUrl so the workbench shows the topics in the
+// sidebar the moment the page loads.
+app.MapBowire(options =>
+{
+    options.ServerUrls.Add("kafka://localhost:9092");
+});
 
 app.Run();

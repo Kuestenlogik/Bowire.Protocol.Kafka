@@ -10,7 +10,11 @@ services:
     image: confluentinc/cp-kafka:7.7.1
     container_name: bowire-kafka-sample
     ports:
-      - "9092:9092"
+      # Host port 9092 maps to the container's PLAINTEXT_HOST listener
+      # (29092 inside) — that listener advertises 'localhost:9092' in
+      # the broker metadata so client connections from the host don't
+      # get redirected to the unresolvable 'kafka:9092' name.
+      - "9092:29092"
     environment:
       # KRaft single-node — broker + controller in one process.
       KAFKA_NODE_ID: 1
