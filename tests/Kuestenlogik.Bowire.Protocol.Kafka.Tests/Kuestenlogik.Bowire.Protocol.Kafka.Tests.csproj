@@ -21,6 +21,10 @@
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" />
     <PackageReference Include="Testcontainers" />
     <PackageReference Include="Testcontainers.Kafka" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Kuestenlogik.Bowire.Protocol.Kafka\Kuestenlogik.Bowire.Protocol.Kafka.csproj" />
