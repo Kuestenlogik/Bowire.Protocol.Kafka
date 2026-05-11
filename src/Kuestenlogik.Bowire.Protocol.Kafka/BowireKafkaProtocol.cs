@@ -88,7 +88,7 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
         };
         // Discovery doesn't carry metadata yet (see InvokeAsync override
         // for the path that does), but the security wiring is set up the
-        // same way so the Storm/Kafka roadmap migration can drop a
+        // same way so the Surgewave/Kafka roadmap migration can drop a
         // metadata-aware Discover overload in without re-plumbing.
 
         using var admin = new AdminClientBuilder(adminConfig).Build();
