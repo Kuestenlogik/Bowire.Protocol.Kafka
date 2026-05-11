@@ -6,7 +6,7 @@
     <!-- Bowire contract package. Carries IBowireProtocol +
          IBowireMockEmitter (the latter under Kuestenlogik.Bowire.Mocking since
          Bowire v0.2), so plugins reference only this one package. -->
-    <PackageVersion Include="Kuestenlogik.Bowire" Version="1.0.12" />
+    <PackageVersion Include="Kuestenlogik.Bowire" Version="1.1.0" />
 
     <!-- Kafka client. Confluent's official .NET client is the de-facto
          standard for Kafka protocol work in .NET. -->
