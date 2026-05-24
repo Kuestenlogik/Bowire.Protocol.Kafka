@@ -4,6 +4,7 @@
 [![codecov](https://codecov.io/gh/Kuestenlogik/Bowire.Protocol.Kafka/branch/main/graph/badge.svg)](https://codecov.io/gh/Kuestenlogik/Bowire.Protocol.Kafka)
 [![NuGet](https://img.shields.io/nuget/v/Kuestenlogik.Bowire.Protocol.Kafka)](https://www.nuget.org/packages/Kuestenlogik.Bowire.Protocol.Kafka)
 [![License](https://img.shields.io/github/license/Kuestenlogik/Bowire.Protocol.Kafka)](https://github.com/Kuestenlogik/Bowire.Protocol.Kafka/blob/main/LICENSE)
+[![Bowire](https://img.shields.io/badge/Bowire-%E2%89%A5%201.5.0%2C%20%3C%202.0-006B9F)](https://github.com/Kuestenlogik/Bowire/blob/main/docs/architecture/compatibility.md)
 
 Apache Kafka protocol plugin for the [Bowire](https://github.com/Kuestenlogik/Bowire) workbench. Browse topics, consume live traffic, produce test messages, and replay recorded Kafka streams through the Bowire mock server. Built on [Confluent.Kafka](https://github.com/confluentinc/confluent-kafka-dotnet).
 
