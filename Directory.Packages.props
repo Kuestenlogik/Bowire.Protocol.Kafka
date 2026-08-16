@@ -20,9 +20,9 @@
     <PackageVersion Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.15.0" />
 
     <!-- Test-only -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-    <PackageVersion Include="xunit.v3" Version="3.2.2" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
     <!-- Testcontainers — real broker + Schema Registry round-trips. The
          Kafka image is published by Confluent under cp-kafka; the
          Testcontainers.Kafka helper drives it with KRaft so no Zookeeper
