@@ -15,16 +15,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
-    <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="Kuestenlogik.Bowire" />
     <PackageReference Include="Confluent.Kafka" />
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" />
     <PackageReference Include="Testcontainers" />
     <PackageReference Include="Testcontainers.Kafka" />
-    <PackageReference Include="coverlet.collector">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Kuestenlogik.Bowire.Protocol.Kafka\Kuestenlogik.Bowire.Protocol.Kafka.csproj" />
