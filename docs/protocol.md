@@ -60,10 +60,19 @@ A short-lived `IAdminClient` queries broker metadata. Every non-internal topic s
 
 | Method    | Kind            | Description |
 |-----------|-----------------|-------------|
-| `consume` | ServerStreaming | Subscribe with a throwaway group id (`bowire-<hex>`), yield one envelope per message |
+| `consume` | ServerStreaming | Subscribe with a throwaway group id (`<consumerGroupPrefix>-<hex>`), yield one envelope per message |
 | `produce` | Unary           | Publish one message; optional `key` and `partition` via metadata |
 
 A synthetic `Cluster` service surfaces broker / topic counts so the sidebar shows "what's there" even before you pick a topic. Internal topics (`__consumer_offsets`, `_schemas`, `_confluent*`) are hidden unless the workbench's internal-services toggle is on.
+
+### Settings
+
+Both live under Settings → Kafka in the workbench and take effect on the next call.
+
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| `discoveryTimeoutSeconds` | `5` | How long discovery waits on broker metadata. Also bounds the admin client's socket timeout — a socket that gave up sooner would truncate the wait. |
+| `consumerGroupPrefix` | `bowire` | Prefix for the throwaway group id a `consume` opens. Set it to something your broker's group ACLs allow. |
 
 ## Consume envelope
 

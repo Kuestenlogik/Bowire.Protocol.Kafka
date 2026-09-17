@@ -7,6 +7,7 @@ using System.Text.Json;
 using Confluent.Kafka;
 using Kuestenlogik.Bowire;
 using Kuestenlogik.Bowire.Models;
+using Kuestenlogik.Bowire.Plugins;
 
 namespace Kuestenlogik.Bowire.Protocol.Kafka;
 
@@ -27,7 +28,8 @@ namespace Kuestenlogik.Bowire.Protocol.Kafka;
 /// </para>
 /// <para>
 /// Consume: opens a consumer with a generated group id
-/// (<c>bowire-&lt;guid&gt;</c>), subscribes to the topic, and yields
+/// (<c>&lt;consumerGroupPrefix&gt;-&lt;guid&gt;</c>, <c>bowire-</c> by
+/// default), subscribes to the topic, and yields
 /// a JSON envelope per message. The envelope carries
 /// <c>topic</c>, <c>partition</c>, <c>offset</c>, <c>timestamp</c>,
 /// <c>key</c> / <c>keyBase64</c>, <c>value</c> / <c>valueBase64</c>,
@@ -74,6 +76,46 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
             "string", "bowire"),
     ];
 
+    /// <summary>
+    /// Resolved in <see cref="Initialize"/>; null when the host registered
+    /// none, which is the CLI's case and every host before
+    /// Kuestenlogik/Bowire#640.
+    /// </summary>
+    private IBowirePluginSettings? _settings;
+
+    /// <inheritdoc />
+    public void Initialize(IServiceProvider? serviceProvider)
+        => _settings = serviceProvider?.GetService(typeof(IBowirePluginSettings)) as IBowirePluginSettings;
+
+    /// <summary>
+    /// How long discovery waits on broker metadata, per the workspace's
+    /// setting.
+    /// </summary>
+    /// <remarks>
+    /// Declared since the plugin shipped and read by nothing: the value
+    /// persisted across reloads, so someone who raised it because a slow
+    /// broker kept timing out watched their change stick and concluded the
+    /// broker was unreachable. Same gap DIS closed in
+    /// Kuestenlogik/Bowire#640.
+    /// </remarks>
+    internal TimeSpan DiscoveryTimeout()
+        => _settings?.GetSeconds(Id, "discoveryTimeoutSeconds", TimeSpan.FromSeconds(5))
+            ?? TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// Prefix for the throwaway consumer group a streaming consume opens.
+    /// </summary>
+    /// <remarks>
+    /// Brokers with ACLs on group ids are the reason this is a setting:
+    /// a group prefix the operator was granted is the difference between
+    /// a stream and an authorization error.
+    /// </remarks>
+    internal string ConsumerGroupPrefix()
+    {
+        var configured = _settings?.GetValue(Id, "consumerGroupPrefix");
+        return string.IsNullOrWhiteSpace(configured) ? "bowire" : configured.Trim();
+    }
+
     /// <inheritdoc />
     public async Task<List<BowireServiceInfo>> DiscoverAsync(
         string serverUrl, bool showInternalServices, CancellationToken ct = default)
@@ -81,10 +123,14 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
         var endpoint = KafkaConnection.TryParse(serverUrl);
         if (endpoint is null) return [];
 
+        var discoveryTimeout = DiscoveryTimeout();
         var adminConfig = new AdminClientConfig
         {
             BootstrapServers = endpoint.Value.BootstrapServers,
-            SocketTimeoutMs = 5_000,
+            // Tied to the same setting: a socket that gives up at five
+            // seconds would truncate a metadata wait the operator raised
+            // to thirty, and the raised value would look ignored.
+            SocketTimeoutMs = (int)discoveryTimeout.TotalMilliseconds,
         };
         // Discovery doesn't carry metadata yet (see InvokeAsync override
         // for the path that does), but the security wiring is set up the
@@ -100,7 +146,7 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
             // TimeSpan — librdkafka's GetMetadata is synchronous and
             // ignores the token directly, but its timeout parameter
             // keeps us responsive.
-            metadata = admin.GetMetadata(TimeSpan.FromSeconds(5));
+            metadata = admin.GetMetadata(discoveryTimeout);
         }
         catch (KafkaException)
         {
@@ -253,7 +299,7 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
         if (!string.Equals(method, ConsumeMethodName, StringComparison.OrdinalIgnoreCase))
             yield break;
 
-        var groupId = "bowire-" + Guid.NewGuid().ToString("N")[..12];
+        var groupId = ConsumerGroupPrefix() + "-" + Guid.NewGuid().ToString("N")[..12];
         var consumerConfig = new ConsumerConfig
         {
             BootstrapServers = endpoint.Value.BootstrapServers,
