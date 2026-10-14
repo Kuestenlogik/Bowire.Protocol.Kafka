@@ -1,6 +1,7 @@
 // Copyright 2026 Küstenlogik
 // SPDX-License-Identifier: Apache-2.0
 
+using System.Security.Cryptography;
 using System.Text.Json;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
@@ -14,7 +15,8 @@ namespace Kuestenlogik.Bowire.Protocol.Kafka.Sample.Harbor;
 /// Strongly-typed view of the <c>Kafka:</c> section of
 /// <c>appsettings.json</c>.
 /// </summary>
-public sealed class KafkaSampleOptions
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Bound from configuration by the options system.")]
+internal sealed class KafkaSampleOptions
 {
     public string BootstrapServers { get; set; } = "localhost:9092";
     public string PortCallsTopic { get; set; } = "harbor.port-calls";
@@ -33,6 +35,7 @@ public sealed class KafkaSampleOptions
 ///         topic, giving Bowire two streams to switch between.</item>
 /// </list>
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Created by AddHostedService<T>().")]
 internal sealed class HarborStreamPublisher : BackgroundService
 {
     private static readonly (string Name, int Imo)[] Ships =
@@ -51,7 +54,6 @@ internal sealed class HarborStreamPublisher : BackgroundService
     private readonly ILogger<HarborStreamPublisher> _log;
     // Crypto-strength RNG isn't needed for a sample stream picker.
 #pragma warning disable CA5394
-    private readonly Random _rng = new();
 #pragma warning restore CA5394
 
     public HarborStreamPublisher(
@@ -114,10 +116,10 @@ internal sealed class HarborStreamPublisher : BackgroundService
 
     private void ProducePortCall(IProducer<string, byte[]> producer)
     {
-        var ship = Ships[_rng.Next(Ships.Length)];
-        var berth = Berths[_rng.Next(Berths.Length)];
-        var phase = Phases[_rng.Next(Phases.Length)];
-        var teu = _rng.Next(120, 1800);
+        var ship = Ships[RandomNumberGenerator.GetInt32(Ships.Length)];
+        var berth = Berths[RandomNumberGenerator.GetInt32(Berths.Length)];
+        var phase = Phases[RandomNumberGenerator.GetInt32(Phases.Length)];
+        var teu = RandomNumberGenerator.GetInt32(120, 1800);
 
         var evt = new PortCallEvent(
             ShipName: ship.Name,
@@ -136,20 +138,23 @@ internal sealed class HarborStreamPublisher : BackgroundService
             Value = payload,
         }, DeliveryReport);
 
-        _log.LogInformation("port-call {Ship} {Phase} at {Berth}", ship.Name, phase, berth);
+        if (_log.IsEnabled(LogLevel.Information))
+        {
+            _log.LogInformation("port-call {Ship} {Phase} at {Berth}", ship.Name, phase, berth);
+        }
     }
 
     private void ProduceBerthStatus(IProducer<string, byte[]> producer)
     {
-        var berth = Berths[_rng.Next(Berths.Length)];
-        var occupied = _rng.Next(2) == 0;
-        var ship = occupied ? Ships[_rng.Next(Ships.Length)].Name : null;
+        var berth = Berths[RandomNumberGenerator.GetInt32(Berths.Length)];
+        var occupied = RandomNumberGenerator.GetInt32(2) == 0;
+        var ship = occupied ? Ships[RandomNumberGenerator.GetInt32(Ships.Length)].Name : null;
 
         var evt = new BerthStatusEvent(
             Berth: berth,
             State: occupied ? "occupied" : "free",
             CurrentShip: ship,
-            QueueLength: _rng.Next(0, 4),
+            QueueLength: RandomNumberGenerator.GetInt32(0, 4),
             At: DateTimeOffset.UtcNow);
 
         var payload = JsonSerializer.SerializeToUtf8Bytes(evt);
@@ -201,9 +206,12 @@ internal sealed class HarborStreamPublisher : BackgroundService
             try
             {
                 await admin.CreateTopicsAsync(wanted).ConfigureAwait(false);
-                _log.LogInformation(
-                    "Created topics {Topics}",
-                    string.Join(", ", wanted.Select(w => w.Name)));
+                if (_log.IsEnabled(LogLevel.Information))
+                {
+                    _log.LogInformation(
+                        "Created topics {Topics}",
+                        string.Join(", ", wanted.Select(w => w.Name)));
+                }
                 return;
             }
             catch (CreateTopicsException ex)
@@ -224,9 +232,12 @@ internal sealed class HarborStreamPublisher : BackgroundService
             }
             catch (KafkaException ex) when (DateTime.UtcNow < deadline)
             {
-                _log.LogInformation(
-                    "Waiting for Kafka… ({Reason})",
-                    ex.Error.Reason);
+                if (_log.IsEnabled(LogLevel.Information))
+                {
+                    _log.LogInformation(
+                        "Waiting for Kafka… ({Reason})",
+                        ex.Error.Reason);
+                }
                 await Task.Delay(TimeSpan.FromSeconds(2), ct).ConfigureAwait(false);
             }
         }

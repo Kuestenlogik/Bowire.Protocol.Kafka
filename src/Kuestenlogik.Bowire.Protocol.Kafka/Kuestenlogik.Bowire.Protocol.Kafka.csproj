@@ -5,8 +5,6 @@
     <PackageId>Kuestenlogik.Bowire.Protocol.Kafka</PackageId>
     <PackageTags>bowire;bowire-plugin;kafka;confluent;messaging;developer-tools</PackageTags>
     <IsPackable>true</IsPackable>
-    <!-- CA1873: structured-log args that are plain property accesses. -->
-    <NoWarn>$(NoWarn);CA1873</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

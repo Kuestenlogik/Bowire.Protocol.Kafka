@@ -10,7 +10,7 @@ namespace Kuestenlogik.Bowire.Protocol.Kafka.Sample.Harbor;
 /// <c>unloading</c>, <c>departing</c>) so the consume stream in Bowire
 /// is never repetitive.
 /// </summary>
-public sealed record PortCallEvent(
+internal sealed record PortCallEvent(
     string ShipName,
     int Imo,
     string Berth,
@@ -23,7 +23,7 @@ public sealed record PortCallEvent(
 /// the <c>harbor.berth-status</c> topic. Gives the workbench a second,
 /// chunkier stream to switch between for visual contrast.
 /// </summary>
-public sealed record BerthStatusEvent(
+internal sealed record BerthStatusEvent(
     string Berth,
     string State,
     string? CurrentShip,

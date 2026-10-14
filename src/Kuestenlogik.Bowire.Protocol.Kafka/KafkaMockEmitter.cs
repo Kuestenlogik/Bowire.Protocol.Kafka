@@ -79,9 +79,12 @@ public sealed class KafkaMockEmitter : IBowireMockEmitter
         _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         _schedulerTask = Task.Run(() => RunAsync(kafkaSteps, options, logger, _cts.Token), _cts.Token);
 
-        logger.LogInformation(
-            "kafka-emitter sending → {Bootstrap} (steps={Count})",
-            bootstrap, kafkaSteps.Count);
+        if (logger.IsEnabled(LogLevel.Information))
+        {
+            logger.LogInformation(
+                "kafka-emitter sending → {Bootstrap} (steps={Count})",
+                bootstrap, kafkaSteps.Count);
+        }
         return Task.CompletedTask;
     }
 
@@ -172,9 +175,12 @@ public sealed class KafkaMockEmitter : IBowireMockEmitter
             {
                 await _producer!.ProduceAsync(step.Service, message, ct);
             }
-            logger.LogInformation(
-                "kafka-emit(step={StepId}, topic={Topic}, bytes={Bytes})",
-                step.Id, step.Service, payload.Length);
+            if (logger.IsEnabled(LogLevel.Information))
+            {
+                logger.LogInformation(
+                    "kafka-emit(step={StepId}, topic={Topic}, bytes={Bytes})",
+                    step.Id, step.Service, payload.Length);
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

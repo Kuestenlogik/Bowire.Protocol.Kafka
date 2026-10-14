@@ -10,6 +10,7 @@ insert_final_newline = true
 
 [*.cs]
 # CA2007: Consider calling ConfigureAwait on the awaited task
+# Not applicable in ASP.NET / plugin code where we want the synchronization context.
 dotnet_diagnostic.CA2007.severity = none
 
 # CA1031: Do not catch general exception types
@@ -24,4 +25,5 @@ dotnet_diagnostic.CA1848.severity = none
 dotnet_diagnostic.CA1062.severity = none
 
 [tests/**/*.cs]
+# CA1707: test methods use underscores by convention.
 dotnet_diagnostic.CA1707.severity = none

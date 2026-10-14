@@ -2,11 +2,8 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- xUnit reflects on public types for ClassFixture; CA1515 wants
-         tests internal but the fixture has to be public. -->
-    <!-- CA1515: xUnit's ClassFixture needs public types.
-         CA1056: SchemaRegistryUrl as string keeps the test code idiomatic;
-         the SDK accepts strings on the SchemaRegistryConfig.Url field. -->
+    <!-- CA1515: the container fixtures are injected into public xUnit test classes and must be public.
+         CA1056: SchemaRegistryUrl goes to SchemaRegistryConfig.Url, which is a string. -->
     <NoWarn>$(NoWarn);CA1515;CA1056</NoWarn>
   </PropertyGroup>
   <ItemGroup>
