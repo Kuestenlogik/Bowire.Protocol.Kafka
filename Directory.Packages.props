@@ -20,7 +20,7 @@
     <PackageVersion Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.15.1" />
 
     <!-- Test-only -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
     <!-- Testcontainers — real broker + Schema Registry round-trips. The
          Kafka image is published by Confluent under cp-kafka; the
