@@ -88,11 +88,12 @@ Each message arrives as:
   "keyBase64": "b3JkZXItNDI=",
   "value": "{\"id\":42,\"total\":19.95}",
   "valueBase64": "eyJpZCI6NDIsInRvdGFsIjoxOS45NX0=",
-  "bytes": 23
+  "bytes": 23,
+  "headers": [{ "key": "trace-id", "value": "abc-123", "valueBase64": "YWJjLTEyMw==" }]
 }
 ```
 
-`key` / `value` are the UTF-8 decode when the bytes map cleanly; `null` for binary payloads. `keyBase64` / `valueBase64` are always present so the workbench can hex-dump arbitrary payloads (Avro, Protobuf, MessagePack, …).
+`key` / `value` are the UTF-8 decode when the bytes map cleanly; `null` for binary payloads. `keyBase64` / `valueBase64` are always present so the workbench can hex-dump arbitrary payloads (Avro, Protobuf, MessagePack, …). `headers` lists the record's headers in order, repeats included, the same way: `value` is the UTF-8 text or `null`, `valueBase64` always holds the bytes; `null` when the record has none.
 
 When the URL carries `?schema-registry=…` and the message body is framed in the Confluent wire format (`0x00` magic byte + 4-byte big-endian schema id + Avro/JSON body), the plugin decodes it on the fly. The `value` field then carries the JSON projection and an additional `encoding` field tags the schema kind (`"avro"`, …) so the UI can pick the right rendering. Plain UTF-8 / opaque binary stays in the original fallback path — the registry isn't consulted unless the framing prefix is present.
 
@@ -104,6 +105,9 @@ The `produce` method publishes a single message taken from the first invocation 
 |--------------|---------|
 | `key` | Message key (UTF-8 string) |
 | `partition` | Target partition number (optional — round-robins when absent) |
+| *any other key* | Sent as a record header, its value as UTF-8 bytes |
+
+Bowire's own markers (keys starting with `__bowire`, among them the security markers below) are never sent as headers.
 
 ## Security
 

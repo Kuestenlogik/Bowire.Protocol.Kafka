@@ -229,8 +229,8 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
             Acks = Acks.Leader,
         };
 
-        // Apply mTLS / SASL knobs from the magic metadata markers and
-        // strip them before forwarding the rest as Kafka headers.
+        // Apply mTLS / SASL knobs from the magic metadata markers; the rest
+        // (but key and partition) goes out as record headers (#93).
         var sanitisedMetadata = KafkaSecurityConfig.Apply(producerConfig, metadata);
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -241,6 +241,7 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
         {
             Key = key,
             Value = Encoding.UTF8.GetBytes(payload),
+            Headers = KafkaRecordHeaders.FromMetadata(sanitisedMetadata),
         };
 
         DeliveryResult<string?, byte[]> result;
@@ -518,6 +519,8 @@ public sealed class BowireKafkaProtocol : IBowireProtocol
             valueBase64 = Convert.ToBase64String(valueBytes),
             bytes = valueBytes.Length,
             encoding,
+            // #93 - what a produce sends as headers is shown when consumed.
+            headers = KafkaRecordHeaders.ToEnvelope(result.Message.Headers),
         };
         return JsonSerializer.Serialize(envelope);
     }
